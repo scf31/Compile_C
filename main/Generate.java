@@ -5,7 +5,7 @@ import generated.MathExprLexer;
 import java.util.ArrayList;
 
 /**
- * Created by max on 12.01.2015.
+ * Created by max on 30.12.2014.
  */
 public class Generate {
 
