@@ -32,11 +32,11 @@ public class Generate {
                 break;
 
             case MathExprLexer.CALL:
-                if (node.getChild(0).getText() == "readInt")
+                if (node.getChild(0).getText().equals("readInt"))
                 {
                     code.add("inp");
                 }
-                if (node.getChild(0).getText() == "printInt")
+                if (node.getChild(0).getText().equals("printInt"))
                 {
                     Gen((AstNode)node.getChild(1).getChild(0), code, label);
                     code.add("    call void [mscorlib]System.Console::WriteLine(int32)\n");
