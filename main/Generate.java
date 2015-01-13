@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Generate {
     final int temp1 = 1001;
 
-    public void Gen(AstNode node, ArrayList<String> code, ref int label)
+    public void Gen(AstNode node, ArrayList<String> code, int label) //TODO сделать у всех лейблов смену оригинала
     {
         int templabel;
         int tempLabel;
@@ -21,7 +21,7 @@ public class Generate {
             case MathExprLexer.BLOCK:
                 for (int i = 0; i < node.getChildCount(); i++)
                 {
-                    Gen((AstNode)node.GetChild(i), code, ref label);
+                    Gen((AstNode)node.getChild(i), code, label);
                 }
                 break;
             case MathExprLexer.VAR:
@@ -32,22 +32,22 @@ public class Generate {
                 break;
 
             case MathExprLexer.CALL:
-                if (node.GetChild(0).Text == "readInt")
+                if (node.getChild(0).getText() == "readInt")
                 {
-                    code.Add("inp");
+                    code.add("inp");
                 }
-                if (node.GetChild(0).Text == "printInt")
+                if (node.getChild(0).getText() == "printInt")
                 {
-                    Gen((AstNode)node.GetChild(1).GetChild(0), code, ref label);
-                    code.Add(string.Format("    call void [mscorlib]System.Console::WriteLine(int32)\n"));
+                    Gen((AstNode)node.getChild(1).getChild(0), code, label);
+                    code.add("    call void [mscorlib]System.Console::WriteLine(int32)\n");
                 }
 
                 break;
-            case MathExprLexer.IDENT://
-                code.Add(string.Format("    ldloc.s {0}\n", node.Index));
+            case MathExprLexer.IDENTIFIER://
+                code.add(String.format("    ldloc.s %1$s\n", node.getChildIndex()));
                 break;
             case MathExprLexer.NUMBER:
-                code.Add(string.Format("    ldc.i4.s {0}\n", node.Text));
+                code.add(String.format("    ldc.i4.s %1$s\n", node.getText()));
                 break;
                 /*   case MathExprLexer.TRUE:
                        code.Add("pushc 1");
@@ -58,85 +58,85 @@ public class Generate {
 
                      */
             case MathExprLexer.ASSIGN:
-                Gen((AstNode)node.GetChild(1), code, ref label);
-                code.Add(string.Format("    stloc.s {0}\n", ((AstNode)node.GetChild(0)).Index));
+                Gen((AstNode)node.getChild(1), code, label);
+                code.add(String.format("    stloc.s %1$s\n", ((AstNode) node.getChild(0)).getChildIndex()));
 
                 break;
             //  case MathExprLexer.RETURN:
             // break
             case MathExprLexer.ADD:
-                Gen((AstNode)node.GetChild(0), code, ref label);
-                Gen((AstNode)node.GetChild(1), code, ref label);
-                code.Add("add");
+                Gen((AstNode)node.getChild(0), code, label);
+                Gen((AstNode)node.getChild(1), code, label);
+                code.add("add");
                 break;
             case MathExprLexer.SUB:
-                Gen((AstNode)node.GetChild(0), code, ref label);
-                Gen((AstNode)node.GetChild(1), code, ref label);
-                code.Add("sub");
+                Gen((AstNode)node.getChild(0), code, label);
+                Gen((AstNode)node.getChild(1), code,  label);
+                code.add("sub");
                 break;
             case MathExprLexer.MUL:
-                Gen((AstNode)node.GetChild(0), code, ref label);
-                Gen((AstNode)node.GetChild(1), code, ref label);
-                code.Add("mul");
+                Gen((AstNode)node.getChild(0), code,  label);
+                Gen((AstNode)node.getChild(1), code,  label);
+                code.add("mul");
                 break;
             case MathExprLexer.DIV:
-                Gen((AstNode)node.GetChild(0), code, ref label);
-                Gen((AstNode)node.GetChild(1), code, ref label);
-                code.Add("div");
+                Gen((AstNode)node.getChild(0), code,  label);
+                Gen((AstNode)node.getChild(1), code,  label);
+                code.add("div");
                 break;
             case MathExprLexer.GE:
-                Gen((AstNode)node.GetChild(0), code, ref label);
-                Gen((AstNode)node.GetChild(1), code, ref label);
-                code.Add("clt");
-                code.Add("ldc.i4.0");
-                code.Add("ceq");
+                Gen((AstNode)node.getChild(0), code,  label);
+                Gen((AstNode)node.getChild(1), code,  label);
+                code.add("clt");
+                code.add("ldc.i4.0");
+                code.add("ceq");
                 break;
             case MathExprLexer.LE:
-                Gen((AstNode)node.GetChild(0), code, ref label);
-                Gen((AstNode)node.GetChild(1), code, ref label);
-                code.Add("cgt");
-                code.Add("ldc.i4.0");
-                code.Add("ceq");
+                Gen((AstNode)node.getChild(0), code,  label);
+                Gen((AstNode)node.getChild(1), code,  label);
+                code.add("cgt");
+                code.add("ldc.i4.0");
+                code.add("ceq");
 
                 break;
-            //Gen((AstNode)node.GetChild(1), code, ref label);
-            //Gen((AstNode)node.GetChild(0), code, ref label);
+            //Gen((AstNode)node.GetChild(1), code,  label);
+            //Gen((AstNode)node.GetChild(0), code,  label);
             //code.Add("cmp");
             //code.Add("pushc 1");
             //code.Add("add");
             //break;
-            case MathExprLexer.NEQUALS:
-                Gen((AstNode)node.GetChild(0), code, ref label);
-                Gen((AstNode)node.GetChild(1), code, ref label);
-                code.Add("ceq");
-                code.Add("ldc.i4.0");
-                code.Add("ceq");
+            case MathExprLexer.NOTEQUALS:
+                Gen((AstNode)node.getChild(0), code,  label);
+                Gen((AstNode)node.getChild(1), code,  label);
+                code.add("ceq");
+                code.add("ldc.i4.0");
+                code.add("ceq");
                 break;
 
             case MathExprLexer.EQUALS:
-                Gen((AstNode)node.GetChild(0), code, ref label);
-                Gen((AstNode)node.GetChild(1), code, ref label);
-                code.Add("ceq");
+                Gen((AstNode)node.getChild(0), code,  label);
+                Gen((AstNode)node.getChild(1), code,  label);
+                code.add("ceq");
                 break;
 
             case MathExprLexer.GT:
-                Gen((AstNode)node.GetChild(0), code, ref label);
-                Gen((AstNode)node.GetChild(1), code, ref label);
-                code.Add("cgt");
+                Gen((AstNode)node.getChild(0), code,  label);
+                Gen((AstNode)node.getChild(1), code,  label);
+                code.add("cgt");
                 break;
-            //Gen((AstNode)node.GetChild(0), code, ref label);
-            //Gen((AstNode)node.GetChild(1), code, ref label);
+            //Gen((AstNode)node.GetChild(0), code,  label);
+            //Gen((AstNode)node.GetChild(1), code,  label);
             //code.Add("cmp");
             // break;
             case MathExprLexer.LT:
 
-                Gen((AstNode)node.GetChild(0), code, ref label);
-                Gen((AstNode)node.GetChild(1), code, ref label);
-                code.Add("clt");
+                Gen((AstNode)node.getChild(0), code,  label);
+                Gen((AstNode)node.getChild(1), code,  label);
+                code.add("clt");
                 break;
 
-            //Gen((AstNode)node.GetChild(1), code, ref label);
-            //Gen((AstNode)node.GetChild(0), code, ref label);
+            //Gen((AstNode)node.GetChild(1), code,  label);
+            //Gen((AstNode)node.GetChild(0), code,  label);
             //code.Add("cmp");
             //break;
             case MathExprLexer.NOT:
@@ -150,46 +150,46 @@ public class Generate {
             case MathExprLexer.WHILE:
                 tempLabel = label;
                 label++;
-                code.Add(string.Format("  L1_{0:X4}:\n", tempLabel));
-                Gen((AstNode)node.GetChild(0), code, ref label);
-                code.Add(string.Format("    brfalse.s L2_{0:X4}\n", tempLabel));
-                Gen((AstNode)node.GetChild(1), code, ref label);
-                code.Add(string.Format("    br.s L1_{0:X4}\n", tempLabel));
-                code.Add(string.Format("  L2_{0:X4}:\n", tempLabel));
+                code.add(String.format("  L1_%1$s\n", tempLabel));
+                Gen((AstNode)node.getChild(0), code,  label);
+                code.add(String.format("    brfalse.s L2_%1$s\n", tempLabel));
+                Gen((AstNode)node.getChild(1), code,  label);
+                code.add(String.format("    br.s L1_%1$s\n", tempLabel));
+                code.add(String.format("  L2_%1$s\n", tempLabel));
                 break;
             case MathExprLexer.IF:
                 templabel = label;
                 label++;
-                Gen((AstNode)node.GetChild(0), code, ref label);
-                code.Add(string.Format("    brfalse.s L1_{0:X4}\n", templabel));
-                Gen((AstNode)node.GetChild(1), code, ref label); ;
-                code.Add(string.Format("    br.s L2_{0:X4}\n", templabel));
-                code.Add(string.Format("  L1_{0:X4}:\n", templabel));
+                Gen((AstNode)node.getChild(0), code,  label);
+                code.add(String.format("    brfalse.s L1_%1$s\n", templabel));
+                Gen((AstNode)node.getChild(1), code,  label); ;
+                code.add(String.format("    br.s L2_%1$s\n", templabel));
+                code.add(String.format("  L1_%1$s\n", templabel));
 
-                if (node.ChildCount > 2)
-                    Gen((AstNode)node.GetChild(2), code, ref label);
-                code.Add(string.Format("  L2_{0:X4}:\n", templabel));
+                if (node.getChildCount() > 2)
+                    Gen((AstNode)node.getChild(2), code,  label);
+                code.add(String.format("  L2_%1$s\n", templabel));
                 break;
 
             case MathExprLexer.FOR:
                 tempLabel = label;
                 label++;
-                Gen((AstNode)node.GetChild(1), code, ref label);
-                code.Add(string.Format("    stloc.s {0}\n", node.Index));
-                code.Add(string.Format("  L1_{0:X4}:\n", tempLabel));
-                code.Add(string.Format("    ldloc.s {0}\n", node.Index));
-                Gen((AstNode)node.GetChild(2), code, ref label);
-                code.Add(string.Format("    sub\n"));
-                code.Add(string.Format("    ldc.i4.s {0}\n", 1));
-                code.Add(string.Format("    sub\n"));
-                code.Add(string.Format("    brfalse.s L2_{0:X4}\n", tempLabel));
-                Gen((AstNode)node.GetChild(3), code, ref label);
-                code.Add(string.Format("    ldloc.s {0}\n", node.Index));
-                code.Add(string.Format("    ldc.i4.s {0}\n", 1));
-                code.Add(string.Format("    add\n"));
-                code.Add(string.Format("    stloc.s {0}\n", node.Index));
-                code.Add(string.Format("    br.s L1_{0:X4}\n", tempLabel));
-                code.Add(string.Format("  L2_{0:X4}:\n", tempLabel));
+                Gen((AstNode)node.getChild(1), code,  label);
+                code.add(String.format("    stloc.s %1$s\n", node.getChildIndex()));
+                code.add(String.format("  L1_%1$s\n", tempLabel));
+                code.add(String.format("    ldloc.s %1$s\n", node.getChildIndex()));
+                Gen((AstNode)node.getChild(2), code,  label);
+                code.add(String.format("    sub\n"));
+                code.add(String.format("    ldc.i4.s %1$s\n", 1));
+                code.add(String.format("    sub\n"));
+                code.add(String.format("    brfalse.s L2_%1$s\n", tempLabel));
+                Gen((AstNode)node.getChild(3), code,  label);
+                code.add(String.format("    ldloc.s %1$s\n", node.getChildIndex()));
+                code.add(String.format("    ldc.i4.s %1$s\n", 1));
+                code.add(String.format("    add\n"));
+                code.add(String.format("    stloc.s %1$s\n", node.getChildIndex()));
+                code.add(String.format("    br.s L1_%1$s\n", tempLabel));
+                code.add(String.format("  L2_%1$s\n", tempLabel));
                 break;
             default:
                 break;
