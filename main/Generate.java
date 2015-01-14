@@ -18,15 +18,35 @@ public class Generate {
 
         switch (node.getType()) {
             case MathExprLexer.PROGRAM:
+
             case MathExprLexer.BLOCK:
                 for (int i = 0; i < node.getChildCount(); i++) {
+
                     generate((AstNode) node.getChild(i), code, originalLabel);
+
                 }
                 break;
             case MathExprLexer.VAR:
+                code.add(node.getChild(0).getText() + "  ");
+                for (int i = 0; i < node.getChildCount(); i++) {
+                    generate((AstNode) node.getChild(0).getChild(i), code, originalLabel);
+                }
                 break;
 
             case MathExprLexer.FUNCTION:
+                for (int i = 0; i < node.getChildCount(); i++) {
+
+                    generate((AstNode) node.getChild(i), code, originalLabel);
+
+                }
+                break;
+
+            case MathExprLexer.PARAMETERS:
+                for (int i = 0; i < node.getChildCount(); i++) {
+
+                    generate((AstNode) node.getChild(i), code, originalLabel);
+                    generate((AstNode) node.getChild(i).getChild(0), code, originalLabel);
+                }
                 break;
 
             case MathExprLexer.CALL:
@@ -40,47 +60,54 @@ public class Generate {
                 break;
 
             case MathExprLexer.IDENTIFIER://
-                code.add(String.format("    ldloc.s %1$s\n", node.getChildIndex()));
+                code.add(node.getText());
                 break;
             case MathExprLexer.NUMBER:
-                code.add(String.format("    ldc.i4.s %1$s\n", node.getText()));
+                code.add(node.getText());
                 break;
-                /*   case MathExprLexer.TRUE:
-                       code.Add("pushc 1");
+                   case MathExprLexer.TRUE:
+                       code.add("true");
                        break;
                    case MathExprLexer.FALSE:
-                       code.Add("pushc 0");
+                       code.add("false");
                        break;
 
-                     */
+
             case MathExprLexer.ASSIGN:
+//                generate((AstNode) node.getChild(1), code, originalLabel);
+//                code.add(String.format("  %1$s  = %2$s \n", ((AstNode) node.getChild(0)).getText(), ((AstNode) node.getChild(1)).getText()));
+
+                generate((AstNode) node.getChild(0), code, originalLabel);
+                code.add("=");
                 generate((AstNode) node.getChild(1), code, originalLabel);
-                code.add(String.format("    stloc.s %1$s\n", ((AstNode) node.getChild(0)).getChildIndex()));
                 break;
             //  case MathExprLexer.RETURN:
             // break
             case MathExprLexer.ADD:
                 generate((AstNode) node.getChild(0), code, originalLabel);
+                code.add("+");
                 generate((AstNode) node.getChild(1), code, originalLabel);
-                code.add("add");
                 break;
 
             case MathExprLexer.SUB:
                 generate((AstNode) node.getChild(0), code, originalLabel);
+                code.add("-");
                 generate((AstNode) node.getChild(1), code, originalLabel);
-                code.add("sub");
+
                 break;
 
             case MathExprLexer.MUL:
                 generate((AstNode) node.getChild(0), code, originalLabel);
+                code.add("*");
                 generate((AstNode) node.getChild(1), code, originalLabel);
-                code.add("mul");
+
                 break;
 
             case MathExprLexer.DIV:
                 generate((AstNode) node.getChild(0), code, originalLabel);
+                code.add("/");
                 generate((AstNode) node.getChild(1), code, originalLabel);
-                code.add("div");
+
                 break;
 
             case MathExprLexer.GE:
@@ -106,16 +133,15 @@ public class Generate {
             //break;
             case MathExprLexer.NOTEQUALS:
                 generate((AstNode) node.getChild(0), code, originalLabel);
+                code.add("!=");
                 generate((AstNode) node.getChild(1), code, originalLabel);
-                code.add("ceq");
-                code.add("ldc.i4.0");
-                code.add("ceq");
                 break;
 
             case MathExprLexer.EQUALS:
                 generate((AstNode) node.getChild(0), code, originalLabel);
+                code.add("==");
                 generate((AstNode) node.getChild(1), code, originalLabel);
-                code.add("ceq");
+
                 break;
 
             case MathExprLexer.GT:

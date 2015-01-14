@@ -1,6 +1,7 @@
 package main;
 
 import java.io.*;
+import java.util.ArrayList;
 
 import generated.MathExprLexer;
 import generated.MathExprParser;
@@ -24,6 +25,13 @@ public class Program {
         SemanticChecker sc = new SemanticChecker();
         sc.Check((AstNode)program, new Context(null));
         //System.out.println("OK!");
+        Generate gen = new Generate();
+        ArrayList<String> code = new ArrayList<String>();
+        gen.generate((AstNode)program,code,1);
+        System.out.println("Result :\n");
+        for (String str : code){
+            System.out.println(str+"\n");
+        }
     }
     catch (Exception e) {
       System.out.println("Error: " + e);
