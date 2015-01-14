@@ -9,213 +9,170 @@ import java.util.ArrayList;
  */
 public class Generate {
 
-    final int temp1 = 1001;
-    private int originalLabel;
-
-    public void generate(AstNode node, ArrayList<String> code, int label) {
-        int templabel;
-        int tempLabel;
+    public void generate(AstNode node, ArrayList<String> code) {
 
         switch (node.getType()) {
             case MathExprLexer.PROGRAM:
 
             case MathExprLexer.BLOCK:
+                code.add("{\n");
                 for (int i = 0; i < node.getChildCount(); i++) {
-
-                    generate((AstNode) node.getChild(i), code, originalLabel);
-
+                    generate((AstNode) node.getChild(i), code);
                 }
+                code.add("}\n");
                 break;
             case MathExprLexer.VAR:
-                code.add(node.getChild(0).getText() + "  ");
+                code.add(node.getChild(0).getText());
                 for (int i = 0; i < node.getChildCount(); i++) {
-                    generate((AstNode) node.getChild(0).getChild(i), code, originalLabel);
+                    generate((AstNode) node.getChild(0).getChild(i), code);
                 }
+                code.add(";\n");
                 break;
 
             case MathExprLexer.FUNCTION:
                 for (int i = 0; i < node.getChildCount(); i++) {
-
-                    generate((AstNode) node.getChild(i), code, originalLabel);
-
+                    generate((AstNode) node.getChild(i), code);
                 }
                 break;
 
             case MathExprLexer.PARAMETERS:
+                code.add("(");
                 for (int i = 0; i < node.getChildCount(); i++) {
-
-                    generate((AstNode) node.getChild(i), code, originalLabel);
-                    generate((AstNode) node.getChild(i).getChild(0), code, originalLabel);
+                    generate((AstNode) node.getChild(i), code);
+                    generate((AstNode) node.getChild(i).getChild(0), code);
+                    if(i+1!=node.getChildCount()){
+                        code.add(", ");
+                    }
                 }
+                code.add(")");
                 break;
 
             case MathExprLexer.CALL:
-                if (node.getChild(0).getText().equals("readInt")) {
-                    code.add("inp");
+                code.add(node.getChild(0).getText()+"( ");
+                for (int i=0;i<node.getChild(1).getChildCount();i++){
+                    code.add(node.getChild(1).getChild(i).getText());
+                    if(i+1!=node.getChildCount()){
+                        code.add(", ");
+                    }
                 }
-                if (node.getChild(0).getText().equals("printInt")) {
-                    generate((AstNode) node.getChild(1).getChild(0), code, originalLabel);
-                    code.add("    call void [mscorlib]System.Console::WriteLine(int32)\n");
-                }
+                code.add(");");
                 break;
 
-            case MathExprLexer.IDENTIFIER://
+            case MathExprLexer.IDENTIFIER:
                 code.add(node.getText());
                 break;
             case MathExprLexer.NUMBER:
                 code.add(node.getText());
                 break;
-                   case MathExprLexer.TRUE:
-                       code.add("true");
-                       break;
-                   case MathExprLexer.FALSE:
-                       code.add("false");
-                       break;
-
-
-            case MathExprLexer.ASSIGN:
-//                generate((AstNode) node.getChild(1), code, originalLabel);
-//                code.add(String.format("  %1$s  = %2$s \n", ((AstNode) node.getChild(0)).getText(), ((AstNode) node.getChild(1)).getText()));
-
-                generate((AstNode) node.getChild(0), code, originalLabel);
-                code.add("=");
-                generate((AstNode) node.getChild(1), code, originalLabel);
+            case MathExprLexer.TRUE:
+                code.add("true");
                 break;
-            //  case MathExprLexer.RETURN:
-            // break
+            case MathExprLexer.FALSE:
+                code.add("false");
+                break;
+            case MathExprLexer.ASSIGN:
+                generate((AstNode) node.getChild(0), code);
+                code.add("=");
+                generate((AstNode) node.getChild(1), code);
+                code.add(";\n");
+                break;
             case MathExprLexer.ADD:
-                generate((AstNode) node.getChild(0), code, originalLabel);
+                generate((AstNode) node.getChild(0), code);
                 code.add("+");
-                generate((AstNode) node.getChild(1), code, originalLabel);
+                generate((AstNode) node.getChild(1), code);
                 break;
 
             case MathExprLexer.SUB:
-                generate((AstNode) node.getChild(0), code, originalLabel);
+                generate((AstNode) node.getChild(0), code);
                 code.add("-");
-                generate((AstNode) node.getChild(1), code, originalLabel);
-
+                generate((AstNode) node.getChild(1), code);
                 break;
 
             case MathExprLexer.MUL:
-                generate((AstNode) node.getChild(0), code, originalLabel);
+                generate((AstNode) node.getChild(0), code);
                 code.add("*");
-                generate((AstNode) node.getChild(1), code, originalLabel);
-
+                generate((AstNode) node.getChild(1), code);
                 break;
 
             case MathExprLexer.DIV:
-                generate((AstNode) node.getChild(0), code, originalLabel);
+                generate((AstNode) node.getChild(0), code);
                 code.add("/");
-                generate((AstNode) node.getChild(1), code, originalLabel);
-
+                generate((AstNode) node.getChild(1), code);
                 break;
 
             case MathExprLexer.GE:
-                generate((AstNode) node.getChild(0), code, originalLabel);
-                generate((AstNode) node.getChild(1), code, originalLabel);
-                code.add("clt");
-                code.add("ldc.i4.0");
-                code.add("ceq");
+                generate((AstNode) node.getChild(0), code);
+                code.add(">=");
+                generate((AstNode) node.getChild(1), code);
                 break;
 
             case MathExprLexer.LE:
-                generate((AstNode) node.getChild(0), code, originalLabel);
-                generate((AstNode) node.getChild(1), code, originalLabel);
-                code.add("cgt");
-                code.add("ldc.i4.0");
-                code.add("ceq");
+                generate((AstNode) node.getChild(0), code);
+                code.add("<=");
+                generate((AstNode) node.getChild(1), code);
                 break;
-            //generate((AstNode)node.GetChild(1), code,  label);
-            //generate((AstNode)node.GetChild(0), code,  label);
-            //code.Add("cmp");
-            //code.Add("pushc 1");
-            //code.Add("add");
-            //break;
             case MathExprLexer.NOTEQUALS:
-                generate((AstNode) node.getChild(0), code, originalLabel);
+                generate((AstNode) node.getChild(0), code);
                 code.add("!=");
-                generate((AstNode) node.getChild(1), code, originalLabel);
+                generate((AstNode) node.getChild(1), code);
                 break;
 
             case MathExprLexer.EQUALS:
-                generate((AstNode) node.getChild(0), code, originalLabel);
+                generate((AstNode) node.getChild(0), code);
                 code.add("==");
-                generate((AstNode) node.getChild(1), code, originalLabel);
-
+                generate((AstNode) node.getChild(1), code);
                 break;
 
             case MathExprLexer.GT:
-                generate((AstNode) node.getChild(0), code, originalLabel);
-                generate((AstNode) node.getChild(1), code, originalLabel);
-                code.add("cgt");
-                break;
-            //generate((AstNode)node.GetChild(0), code,  label);
-            //generate((AstNode)node.GetChild(1), code,  label);
-            //code.Add("cmp");
-            // break;
-            case MathExprLexer.LT:
-                generate((AstNode) node.getChild(0), code, originalLabel);
-                generate((AstNode) node.getChild(1), code, originalLabel);
-                code.add("clt");
+                generate((AstNode) node.getChild(0), code);
+                code.add(">");
+                generate((AstNode) node.getChild(1), code);
                 break;
 
-            //generate((AstNode)node.GetChild(1), code,  label);
-            //generate((AstNode)node.GetChild(0), code,  label);
-            //code.Add("cmp");
-            //break;
+            case MathExprLexer.LT:
+                generate((AstNode) node.getChild(0), code);
+                code.add("<");
+                generate((AstNode) node.getChild(1), code);
+                break;
+
             case MathExprLexer.NOT:
+                code.add("!");
                 break;
             case MathExprLexer.AND:
+                code.add("&&");
                 break;
             case MathExprLexer.OR:
+                code.add("||");
                 break;
             case MathExprLexer.XOR:
+                code.add("&|");
                 break;
 
             case MathExprLexer.WHILE:
-                tempLabel = originalLabel;
-                originalLabel++;
-                code.add(String.format("  L1_%1$s\n", tempLabel));
-                generate((AstNode) node.getChild(0), code, originalLabel);
-                code.add(String.format("    brfalse.s L2_%1$s\n", tempLabel));
-                generate((AstNode) node.getChild(1), code, originalLabel);
-                code.add(String.format("    br.s L1_%1$s\n", tempLabel));
-                code.add(String.format("  L2_%1$s\n", tempLabel));
+                code.add("while ( ");
+                generate((AstNode) node.getChild(0), code);
+                code.add(")\n");
+                generate((AstNode) node.getChild(1), code);
                 break;
 
             case MathExprLexer.IF:
-                templabel = originalLabel;
-                originalLabel++;
-                generate((AstNode) node.getChild(0), code, originalLabel);
-                code.add(String.format("    brfalse.s L1_%1$s\n", templabel));
-                generate((AstNode) node.getChild(1), code, originalLabel); ;
-                code.add(String.format("    br.s L2_%1$s\n", templabel));
-                code.add(String.format("  L1_%1$s\n", templabel));
-
+                code.add("if (");
+                generate((AstNode) node.getChild(0), code);
+                code.add(")\n");
+                generate((AstNode) node.getChild(1), code);
                 if (node.getChildCount() > 2)
-                    generate((AstNode) node.getChild(2), code, originalLabel);
-                code.add(String.format("  L2_%1$s\n", templabel));
+                    code.add("else\n");
+                generate((AstNode) node.getChild(2), code);
                 break;
 
             case MathExprLexer.FOR:
-                tempLabel = originalLabel;
-                originalLabel++;
-                generate((AstNode) node.getChild(1), code, originalLabel);
-                code.add(String.format("    stloc.s %1$s\n", node.getChildIndex()));
-                code.add(String.format("  L1_%1$s\n", tempLabel));
-                code.add(String.format("    ldloc.s %1$s\n", node.getChildIndex()));
-                generate((AstNode) node.getChild(2), code, originalLabel);
-                code.add(String.format("    sub\n"));
-                code.add(String.format("    ldc.i4.s %1$s\n", 1));
-                code.add(String.format("    sub\n"));
-                code.add(String.format("    brfalse.s L2_%1$s\n", tempLabel));
-                generate((AstNode) node.getChild(3), code, originalLabel);
-                code.add(String.format("    ldloc.s %1$s\n", node.getChildIndex()));
-                code.add(String.format("    ldc.i4.s %1$s\n", 1));
-                code.add(String.format("    add\n"));
-                code.add(String.format("    stloc.s %1$s\n", node.getChildIndex()));
-                code.add(String.format("    br.s L1_%1$s\n", tempLabel));
-                code.add(String.format("  L2_%1$s\n", tempLabel));
+                code.add("if (");
+                generate((AstNode) node.getChild(1), code);
+                code.add(")\n");
+                generate((AstNode) node.getChild(2), code);
+                code.add("else\n");
+                generate((AstNode) node.getChild(3), code);
+                code.add("\n");
                 break;
             default:
                 break;

@@ -27,10 +27,10 @@ public class Program {
         //System.out.println("OK!");
         Generate gen = new Generate();
         ArrayList<String> code = new ArrayList<String>();
-        gen.generate((AstNode)program,code,1);
+        gen.generate((AstNode)program,code);
         System.out.println("Result :\n");
         for (String str : code){
-            System.out.println(str+"\n");
+            System.out.print(str+" ");
         }
     }
     catch (Exception e) {
